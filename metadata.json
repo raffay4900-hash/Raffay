@@ -1,0 +1,6 @@
+{
+  "name": "LOGI MARKETING",
+  "description": "Premium e-commerce platform by LOGI MARKETING featuring real-time product management, dynamic catalog, secure checkout, and cross-device persistent shopping.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

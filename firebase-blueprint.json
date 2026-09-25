@@ -1,0 +1,217 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "An e-commerce product available in the store",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique product identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Product title/name",
+          "minLength": 1,
+          "maxLength": 150
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the product",
+          "maxLength": 3000
+        },
+        "price": {
+          "type": "number",
+          "description": "Regular selling price"
+        },
+        "discountPrice": {
+          "type": "number",
+          "description": "Optional discounted sale price"
+        },
+        "category": {
+          "type": "string",
+          "description": "Product category",
+          "maxLength": 60
+        },
+        "stock": {
+          "type": "number",
+          "description": "Available stock quantity"
+        },
+        "images": {
+          "type": "array",
+          "description": "List of public permanent image URLs"
+        },
+        "isFeatured": {
+          "type": "boolean",
+          "description": "Whether the product is highlighted on homepage"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when created"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when updated"
+        }
+      },
+      "required": ["id", "name", "price", "category", "stock", "images"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "A customer order submitted through checkout",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique order identifier"
+        },
+        "customerName": {
+          "type": "string",
+          "description": "Customer full name",
+          "maxLength": 100
+        },
+        "customerEmail": {
+          "type": "string",
+          "description": "Customer contact email",
+          "maxLength": 120
+        },
+        "customerPhone": {
+          "type": "string",
+          "description": "Customer contact phone number",
+          "maxLength": 30
+        },
+        "shippingAddress": {
+          "type": "string",
+          "description": "Street address for delivery",
+          "maxLength": 300
+        },
+        "city": {
+          "type": "string",
+          "description": "City for delivery",
+          "maxLength": 100
+        },
+        "postalCode": {
+          "type": "string",
+          "description": "Postal or ZIP code",
+          "maxLength": 20
+        },
+        "items": {
+          "type": "array",
+          "description": "List of cart line items ordered"
+        },
+        "subtotal": {
+          "type": "number",
+          "description": "Subtotal order cost"
+        },
+        "shipping": {
+          "type": "number",
+          "description": "Shipping charges"
+        },
+        "total": {
+          "type": "number",
+          "description": "Final order total"
+        },
+        "paymentMethod": {
+          "type": "string",
+          "description": "Selected payment method",
+          "maxLength": 50
+        },
+        "status": {
+          "type": "string",
+          "description": "Order fulfillment status",
+          "enum": ["pending", "processing", "shipped", "delivered", "cancelled"]
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when placed"
+        }
+      },
+      "required": ["id", "customerName", "customerEmail", "customerPhone", "shippingAddress", "items", "total", "status"]
+    },
+    "ImageStorage": {
+      "title": "ImageStorage",
+      "description": "Uploaded image asset record and public URL metadata",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique image asset ID"
+        },
+        "url": {
+          "type": "string",
+          "description": "Public URL where image can be accessed",
+          "maxLength": 2000
+        },
+        "fileName": {
+          "type": "string",
+          "description": "Original file name",
+          "maxLength": 200
+        },
+        "dataUrl": {
+          "type": "string",
+          "description": "Optimized base64 fallback data representation",
+          "maxLength": 800000
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["id", "url"]
+    },
+    "ContactInquiry": {
+      "title": "ContactInquiry",
+      "description": "A customer inquiry or support message submitted via contact form",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique inquiry ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Sender name",
+          "maxLength": 100
+        },
+        "email": {
+          "type": "string",
+          "description": "Sender email",
+          "maxLength": 120
+        },
+        "subject": {
+          "type": "string",
+          "description": "Message subject",
+          "maxLength": 200
+        },
+        "message": {
+          "type": "string",
+          "description": "Inquiry text",
+          "maxLength": 2000
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp submitted"
+        }
+      },
+      "required": ["id", "name", "email", "message"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Collection of all e-commerce products displayed in the store"
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Collection of customer checkout orders"
+    },
+    "/images/{imageId}": {
+      "schema": { "$ref": "#/entities/ImageStorage" },
+      "description": "Collection of uploaded product image records"
+    },
+    "/inquiries/{inquiryId}": {
+      "schema": { "$ref": "#/entities/ContactInquiry" },
+      "description": "Collection of customer support inquiries"
+    }
+  }
+}

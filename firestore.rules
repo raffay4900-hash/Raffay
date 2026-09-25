@@ -1,0 +1,81 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidProduct(data) {
+      return data.keys().hasAll(['id', 'name', 'price', 'category', 'stock', 'images'])
+        && data.id is string && isValidId(data.id)
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 150
+        && (data.description is string ? data.description.size() <= 3000 : true)
+        && data.price is number && data.price >= 0
+        && (('discountPrice' in data && data.discountPrice != null) ? (data.discountPrice is number && data.discountPrice >= 0) : true)
+        && data.category is string && data.category.size() > 0 && data.category.size() <= 60
+        && data.stock is number && data.stock >= 0
+        && data.images is list && data.images.size() <= 20;
+    }
+
+    function isValidOrder(data) {
+      return data.keys().hasAll(['id', 'customerName', 'customerEmail', 'customerPhone', 'shippingAddress', 'items', 'total', 'status'])
+        && data.id is string && isValidId(data.id)
+        && data.customerName is string && data.customerName.size() > 0 && data.customerName.size() <= 100
+        && data.customerEmail is string && data.customerEmail.size() > 0 && data.customerEmail.size() <= 120
+        && data.customerPhone is string && data.customerPhone.size() > 0 && data.customerPhone.size() <= 30
+        && data.shippingAddress is string && data.shippingAddress.size() > 0 && data.shippingAddress.size() <= 300
+        && data.items is list && data.items.size() > 0 && data.items.size() <= 50
+        && data.total is number && data.total >= 0
+        && data.status is string && data.status in ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+    }
+
+    function isValidImage(data) {
+      return data.keys().hasAll(['id', 'url'])
+        && data.id is string && isValidId(data.id)
+        && data.url is string && data.url.size() > 0 && data.url.size() <= 2000;
+    }
+
+    function isValidInquiry(data) {
+      return data.keys().hasAll(['id', 'name', 'email', 'message'])
+        && data.id is string && isValidId(data.id)
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.email is string && data.email.size() > 0 && data.email.size() <= 120
+        && data.message is string && data.message.size() > 0 && data.message.size() <= 2000;
+    }
+
+    // Public catalog & product management
+    match /products/{productId} {
+      allow read: if true;
+      allow create: if isValidId(productId) && isValidProduct(request.resource.data);
+      allow update: if isValidId(productId) && isValidProduct(request.resource.data);
+      allow delete: if isValidId(productId);
+    }
+
+    // Customer checkout orders
+    match /orders/{orderId} {
+      allow read: if isValidId(orderId);
+      allow create: if isValidId(orderId) && isValidOrder(request.resource.data);
+      allow update: if isValidId(orderId) && isValidOrder(request.resource.data);
+      allow delete: if isValidId(orderId);
+    }
+
+    // Public uploaded image metadata & hosting index
+    match /images/{imageId} {
+      allow read: if true;
+      allow create, update: if isValidId(imageId) && isValidImage(request.resource.data);
+      allow delete: if isValidId(imageId);
+    }
+
+    // Contact messages
+    match /inquiries/{inquiryId} {
+      allow read: if isValidId(inquiryId);
+      allow create: if isValidId(inquiryId) && isValidInquiry(request.resource.data);
+    }
+  }
+}
